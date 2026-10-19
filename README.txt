@@ -8,7 +8,7 @@ so VoodooI2C cannot use GPIO interrupts and falls over unless polling is forced.
 This adds a VoodooGPIOTigerLakeH class. The pin tables, pad groups and
 communities are ported from the Linux driver pinctrl-tigerlake.c (GPL-2.0).
 
-STATUS: untested. It was not compiled on macOS (no Xcode where it was written).
+STATUS: v2 - fixed start() to call VoodooGPIOIntel::start (v1 called VoodooGPIO::start, which skipped all setup). Needs hardware confirmation.
 The table data was validated separately (291 pins, 5 communities, contiguous
 pad groups, GPIO 44 -> hardware pin 37).
 
@@ -28,7 +28,7 @@ BUILD WITH XCODE (needs Xcode + git; match the VoodooI2C version you run, 2.9.1)
   git clone https://github.com/acidanthera/MacKernelSDK
   cd Dependencies/VoodooGPIO
   git apply /path/to/tgl-h.patch
-  xcodebuild -project VoodooGPIO.xcodeproj -configuration Release SYMROOT="$PWD/build"
+  xcodebuild -project VoodooGPIO.xcodeproj -target VoodooGPIO -configuration Release SYMROOT="$PWD/build"
 The result is build/Release/VoodooGPIO.kext
 (v2.9.1 pins VoodooGPIO commit 733dc80; the patch was checked against it.)
 

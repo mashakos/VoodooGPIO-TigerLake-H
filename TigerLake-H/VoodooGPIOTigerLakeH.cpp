@@ -19,5 +19,5 @@ bool VoodooGPIOTigerLakeH::start(IOService *provider) {
 
     IOLog("%s::Loading GPIO Data for TigerLake-H\n", getName());
 
-    return VoodooGPIO::start(provider);
+    return VoodooGPIOIntel::start(provider);
 }
