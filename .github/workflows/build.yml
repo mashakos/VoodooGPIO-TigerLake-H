@@ -28,8 +28,9 @@ jobs:
       - name: Build VoodooGPIO (Release, x86_64)
         working-directory: work/Dependencies/VoodooGPIO
         run: |
-          xcodebuild -project VoodooGPIO.xcodeproj -configuration Release \
-            -derivedDataPath build ARCHS=x86_64 ONLY_ACTIVE_ARCH=NO
+          xcodebuild -project VoodooGPIO.xcodeproj -target VoodooGPIO \
+            -configuration Release ARCHS=x86_64 ONLY_ACTIVE_ARCH=NO \
+            SYMROOT="$PWD/build" OBJROOT="$PWD/build/obj"
 
       - name: Package the kext
         run: |
