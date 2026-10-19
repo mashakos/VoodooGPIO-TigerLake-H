@@ -1,0 +1,47 @@
+name: Build VoodooGPIO TGL-H
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout this repo (patch lives here)
+        uses: actions/checkout@v4
+        with:
+          path: patchrepo
+
+      - name: Fetch the VoodooGPIO commit pinned by VoodooI2C v2.9.1
+        run: |
+          mkdir -p work/Dependencies
+          git clone https://github.com/VoodooI2C/VoodooGPIO.git work/Dependencies/VoodooGPIO
+          git -C work/Dependencies/VoodooGPIO checkout 733dc8063f5ef07288a7bc648fff5348df6d8f65
+
+      - name: Fetch MacKernelSDK (project expects it at ../../MacKernelSDK)
+        run: git clone --depth 1 https://github.com/acidanthera/MacKernelSDK.git work/MacKernelSDK
+
+      - name: Apply the Tiger Lake-H patch
+        run: git -C work/Dependencies/VoodooGPIO apply --verbose "$GITHUB_WORKSPACE/patchrepo/tgl-h.patch"
+
+      - name: Build VoodooGPIO (Release, x86_64)
+        working-directory: work/Dependencies/VoodooGPIO
+        run: |
+          xcodebuild -project VoodooGPIO.xcodeproj -configuration Release \
+            -derivedDataPath build ARCHS=x86_64 ONLY_ACTIVE_ARCH=NO
+
+      - name: Package the kext
+        run: |
+          KEXT=$(find work/Dependencies/VoodooGPIO/build -name VoodooGPIO.kext -type d | head -1)
+          echo "Built: $KEXT"
+          test -n "$KEXT"
+          mkdir -p dist
+          ditto -c -k --keepParent "$KEXT" dist/VoodooGPIO-TigerLake-H.kext.zip
+          # sanity: the new class must be in the binary
+          strings "$KEXT/Contents/MacOS/VoodooGPIO" | grep -c TigerLakeH
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VoodooGPIO-TigerLake-H
+          path: dist/VoodooGPIO-TigerLake-H.kext.zip

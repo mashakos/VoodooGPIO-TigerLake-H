@@ -1,0 +1,27 @@
+BUILD WITHOUT XCODE USING GITHUB ACTIONS (free macOS build machines)
+====================================================================
+You need a free GitHub account. No git commands are needed - the web
+interface is enough.
+
+1. On github.com click "+" > New repository. Name it e.g. voodoogpio-tgl-h.
+   Public is simplest (free macOS minutes; private repos use up a smaller quota).
+2. In the new repo: Add file > Upload files > drop in tgl-h.patch > Commit.
+3. Add file > Create new file. In the name box type exactly:
+       .github/workflows/build.yml
+   (typing the slashes creates the folders). Paste the entire contents of
+   build.yml from this folder into the editor > Commit.
+4. Open the Actions tab. If asked, click "I understand my workflows, go ahead".
+   Pick "Build VoodooGPIO TGL-H" > Run workflow. (It may also start by itself
+   after step 3.)
+5. Wait a few minutes. When the run shows a green tick, open it and download
+   the artifact "VoodooGPIO-TigerLake-H" from the bottom of the page.
+6. Unzip it, then unzip VoodooGPIO-TigerLake-H.kext.zip to get VoodooGPIO.kext.
+   Replace in your EFI:
+     EFI/OC/Kexts/VoodooI2C.kext/Contents/PlugIns/VoodooGPIO.kext
+   (see README.txt for the checks to do after rebooting)
+
+If the run fails (red cross): open it, click the failing step, and send the last
+~30 lines of its log. The workflow has not been run before, so a first-try
+failure is possible.
+
+Note: the build is unsigned/ad-hoc signed, like the normal VoodooI2C release.
